@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LIFF Consent</title>
+</head>
+<body>
+  <h2>กำลังเตรียมข้อมูลเพื่อเพิ่มเพื่อน…</h2>
+  <pre id="out"></pre>
+
+  <!-- LIFF v2 SDK -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script src="./main.js"></script>
+</body>
+</html>

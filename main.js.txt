@@ -1,0 +1,46 @@
+const LIFF_ID = "YOUR_LIFF_ID";                 // เอาจาก LINE Developers หลังเพิ่ม LIFF
+const SHEET_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL"; // URL ของ Apps Script (Web App)
+const ADD_FRIEND_URL = "https://line.me/R/ti/p/@YOUR_LINE_OA_ID"; // ลิงก์เพิ่มเพื่อน OA
+
+async function run() {
+  await liff.init({ liffId: LIFF_ID });
+
+  // ถ้ายังไม่ล็อกอิน ให้ขอสิทธิ์พร้อม scope ที่ต้องใช้ (เพื่อดึง email)
+  if (!liff.isLoggedIn()) {
+    liff.login({ scope: ["profile", "openid", "email"] });
+    return;
+  }
+
+  // ดึงข้อมูลโปรไฟล์ + email (ถ้า user ยอม)
+  const profile = await liff.getProfile();      // userId, displayName, pictureUrl
+  const idToken = liff.getDecodedIDToken();     // email จะอยู่ที่นี่
+  const data = {
+    userId: profile.userId,
+    displayName: profile.displayName,
+    email: idToken?.email || "",
+    consent: true,
+    timestamp: new Date().toISOString(),
+  };
+
+  // (แสดงเพื่อ debug ระหว่างพัฒนา)
+  document.getElementById("out").textContent = JSON.stringify(data, null, 2);
+
+  // ส่งไปบันทึกที่ Google Sheets
+  if (SHEET_URL) {
+    await fetch(SHEET_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+  }
+
+  // เสร็จแล้วพาไปหน้าเพิ่มเพื่อน OA
+  if (ADD_FRIEND_URL) {
+    location.href = ADD_FRIEND_URL;
+  }
+}
+
+run().catch(err => {
+  document.getElementById("out").textContent = "Error: " + err?.message;
+  console.error(err);
+});
